@@ -103,6 +103,9 @@ window.LESSON = {
     'reconstructions':'Estimates of past conditions built from surviving evidence.'
   },
   sources:[
+    ['G. Langner (1998), Roman-era survival reconstruction','https://pubmed.ncbi.nlm.nih.gov/12178163/','One contested model: about 20 years at birth and nearly 400 infant deaths per 1,000. Used as an illustrative year-1 best guess; evidence from later Roman centuries, not a measured year-1/global statistic.'],
+    ['CDC/NCHS, Health United States 2019, Table 4','https://www.cdc.gov/nchs/data/hus/2019/004-508.pdf','Selected life expectancy benchmarks, 1900–2000.'],
+    ['CDC/NCHS, Health United States 2001','https://www.cdc.gov/nchs/data/data_acces_files/hus01cht.pdf','Selected infant mortality benchmarks, 1950–1990: 29.2, 26.0, 20.0, 12.6, 9.2 per 1,000 live births.'],
     ['Maddison Project Database 2023','https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023?lang=en','GDPpc sheet, GBR and USA. 2011 international dollars. Early GBR coverage changes; selected benchmarks only. Credit underlying country sources as listed in the database.'],
     ['William D. Nordhaus, Do Real-Output and Real-Wage Measures Capture Reality? The History of Lighting Suggests Not','https://www.nber.org/system/files/chapters/c6064/c6064.pdf','Table 1.6, printed pages 52–53. Labor hours per 1,000 lumen-hours; selected technologies and changing wage measures.'],
     ['CDC/NCHS, life expectancy comparison','https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6019a5.htm','47.3 (1900 registration states) and 76.8 (2000 national).'],

@@ -43,3 +43,9 @@ Published GitHub-origin browser loading and saving passed with synthetic work (n
 The final student flow uses a student-created unique username (two or more letters followed by two or more numbers), with no real name, school student ID, or class-code prompt. The application token is automatically supplied by the static client, as explicitly requested. This remains the migration packet's token/ID access pattern, not student authentication.
 
 A printable emergency.pdf supplies all pre-Boost content, charts, benchmark tables, fifteen writing fields, the vocabulary match, and a glossary in place of hover definitions. Gallery wall evidence and Boost materials remain separate. Exported student PDFs retain completion percentage at the top.
+
+
+## Survival line charts
+Year 1: illustrative best guesses using Langner (1998), PMID 12178163: modeled Roman-era life expectancy about 20 and infant mortality nearly 400/1,000. This contested reconstruction uses Ulpian (died 228 CE), model life tables and inscriptions. Not a measured year-1 statistic, global average, or consensus value. No intermediate century guesses are added. Dashed bridges compare different populations, not an observed series. Modern solid lines connect selected benchmarks, not annual observations. Time axes are proportional.
+Life expectancy: 1900 47.3; 1950 68.2; 1960 69.7; 1970 70.8; 1980 73.7; 1990 75.4; 2000 76.8. CDC/NCHS Health United States 2019 Table 4: https://www.cdc.gov/nchs/data/hus/2019/004-508.pdf. Early registration coverage differs from later national coverage.
+Infant mortality (under one, per 1,000 live births): 1900 approximately 100; 1950 29.2; 1960 26; 1970 20; 1980 12.6; 1990 9.2; 2000 6.89. https://www.cdc.gov/nchs/data/data_acces_files/hus01cht.pdf plus https://www.cdc.gov/nchs/products/databriefs/db09.htm for endpoints. Do not substitute under-five mortality.

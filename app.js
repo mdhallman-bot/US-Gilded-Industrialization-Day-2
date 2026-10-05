@@ -70,14 +70,24 @@ function gdp(mode='zoom'){
  $('gdpChart').innerHTML=svg('Selected GDP per capita estimates, '+lo+' to '+hi,b,340);
 }
 function survival(){
- let b='<text x="45" y="28" font-size="17" font-weight="bold">Two measures of survival · different units</text>';
- for(const [start,title,unit,a,c,max] of [[65,'Life expectancy','Years at birth',47.3,76.8,100],[500,'Infant mortality','Deaths per 1,000 live births',100,6.89,110]]){
-  b+=`<text x="${start}" y="62" font-size="16" font-weight="bold">${title}</text><text x="${start}" y="85" font-size="13">${unit}</text>`;
-  for(const [i,v,date] of [[0,a,'1900*'],[1,c,'2000']]){let xx=start+i*140;b+=`<rect x="${xx}" y="${265-v/max*145}" width="83" height="${v/max*145}" fill="${i?'#236a6c':'#aa4829'}"/><text x="${xx+41}" y="${255-v/max*145}" text-anchor="middle" font-size="16">${v===100?'≈100':v}</text><text x="${xx+41}" y="289" text-anchor="middle" font-size="14">${date}</text>`;}
+ const measures=[{title:'Life expectancy',unit:'Years at birth',ancient:20,max:100,color:'#236a6c',values:[[1900,47.3],[1950,68.2],[1960,69.7],[1970,70.8],[1980,73.7],[1990,75.4],[2000,76.8]]},{title:'Infant mortality',unit:'Deaths before age 1 per 1,000 live births',ancient:400,max:500,color:'#aa4829',values:[[1900,100],[1950,29.2],[1960,26],[1970,20],[1980,12.6],[1990,9.2],[2000,6.89]]}];
+ let b='<text x="45" y="26" font-size="18" font-weight="bold">Survival over time · long view and modern zoom</text>';
+ for(const [i,m] of measures.entries())for(const zoom of [false,true]){
+  const left=65+i*450,top=zoom?390:110,w=345,h=190,lo=zoom?1900:1;
+  const scale=zoom&&i===1?120:m.max;
+  const x=t=>left+(t-lo)/(2000-lo)*w,y=v=>top+h-v/scale*h;
+  b+=`<text x="${left}" y="${top-50}" font-size="16" font-weight="bold">${m.title} · ${zoom?'1900–2000':'1–2000 CE'}</text><text x="${left}" y="${top-28}" font-size="12">${m.unit}</text>`;
+  for(let v=0;v<=scale;v+=scale/5)b+=`<line x1="${left}" x2="${left+w}" y1="${y(v)}" y2="${y(v)}" stroke="#dce3e4"/><text x="${left-9}" y="${y(v)+4}" text-anchor="end" font-size="12">${v}</text>`;
+  for(const t of zoom?[1900,1950,2000]:[1,500,1000,1500,2000])b+=`<text x="${x(t)}" y="${top+h+22}" text-anchor="middle" font-size="12">${t}</text>`;
+  if(!zoom)b+=`<line x1="${x(1)}" y1="${y(m.ancient)}" x2="${x(1900)}" y2="${y(m.values[0][1])}" stroke="#899394" stroke-width="2" stroke-dasharray="7 6"/><circle cx="${x(1)}" cy="${y(m.ancient)}" r="5" fill="white" stroke="#899394" stroke-width="2"><title>Year 1 reference: best guess, Roman-era model, approximately ${m.ancient}. Not a measured year-1 statistic.</title></circle><text x="${left+10}" y="${y(m.ancient)-12}" font-size="13">≈${m.ancient} · best guess*</text>`;
+  b+=`<polyline points="${m.values.map(r=>`${x(r[0])},${y(r[1])}`).join(' ')}" fill="none" stroke="${m.color}" stroke-width="3"/>`;
+  for(const [t,v] of m.values)b+=`<circle cx="${x(t)}" cy="${y(v)}" r="${zoom?4:2}" fill="${m.color}"><title>${t}: ${t===1900&&i===1?'approximately ':''}${v}</title></circle>`;
+  b+=`<text x="${x(2000)-6}" y="${y(m.values.at(-1)[1])-12}" text-anchor="end" font-size="14" fill="${m.color}">${m.values.at(-1)[1]}</text>`;
  }
- b+='<text x="45" y="323" font-size="12">*Early geography/estimation differs. See the notes below; compare within each measure.</text>';
- $('survivalChart').innerHTML=svg('Life expectancy 47.3 to 76.8 years; infant mortality about 100 to 6.89 per thousand',b,345);
+ b+='<text x="45" y="640" font-size="13">*Ancient reference: Roman-era reconstruction placed at year 1 for comparison.</text><text x="45" y="662" font-size="13">Dashed bridge = illustrative connection, not observed centuries. Solid lines = U.S. benchmarks.</text>';
+ $('survivalChart').innerHTML=svg('Life expectancy rises and infant mortality falls. Year 1 Roman-era best guesses: about 20 years and 400 infant deaths per thousand; U.S. benchmarks from 1900 to 2000. Dashed bridges are illustrative, not measured trends.',b,685);
 }
+
 function light(){
  let b='<text x="65" y="25" font-size="17" font-weight="bold">Labor hours for 1,000 lumen-hours · logarithmic scale</text>', x=year=>85+(year-1800)/192*730,y=v=>245-(Math.log10(v)+4)/5*190;
  for(const v of [.0001,.001,.01,.1,1,10])b+=`<line x1="85" y1="${y(v)}" x2="815" y2="${y(v)}" stroke="#e1e5e6"/><text x="75" y="${y(v)+4}" text-anchor="end" font-size="12">${v}</text>`;

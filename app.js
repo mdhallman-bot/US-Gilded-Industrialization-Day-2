@@ -27,7 +27,7 @@ function hydrateTerms(){
  const terms=Object.keys(D.definitions).sort((a,b)=>b.length-a.length);
  const pattern=new RegExp('\\b('+terms.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\b','gi');
  const walker=document.createTreeWalker($('main'),NodeFilter.SHOW_TEXT,{acceptNode(node){
-  return node.parentElement.closest('button,textarea,select,option,label,svg,#vocab,#sources,[data-term],.tip')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;
+  return node.parentElement.closest('a,button,textarea,select,option,label,svg,#vocab,#sources,[data-term],.tip')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;
  }});const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
  const lookup=Object.fromEntries(terms.map(t=>[t.toLowerCase(),t]));
  for(const node of nodes){const text=node.textContent;pattern.lastIndex=0;if(!pattern.test(text))continue;
@@ -200,6 +200,17 @@ async function exportPdf(){
   write('This PDF contains the pre-Boost lesson and student work. Submit the separate Google Doc for the interview and formative reflection.',10);
   async function visit(el){
    if(el.matches?.('.response')){write(cleanText(el.querySelector('label')),11,true);write(el.querySelector('textarea').value.trim()||'[No response entered]',11);return;}
+   if(el.matches?.('figure.lesson-visual')){
+    const picture=el.querySelector('img');
+    try{
+     if(!picture.complete)await new Promise((resolve,reject)=>{const done=()=>{clearTimeout(timeout);picture.removeEventListener('load',loaded);picture.removeEventListener('error',failed);};const loaded=()=>{done();resolve();},failed=()=>{done();reject(Error('Image unavailable'));};const timeout=setTimeout(failed,8000);picture.addEventListener('load',loaded,{once:true});picture.addEventListener('error',failed,{once:true});});
+     if(!picture.naturalWidth)throw Error('Image unavailable');
+     const canvas=document.createElement('canvas'),factor=Math.min(1,1200/picture.naturalWidth);canvas.width=Math.round(picture.naturalWidth*factor);canvas.height=Math.round(picture.naturalHeight*factor);const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(picture,0,0,canvas.width,canvas.height);
+     const imageWidth=el.classList.contains('concept')?95:145,h=imageWidth*canvas.height/canvas.width;
+     if(y+h>260){doc.addPage();y=20;}doc.addImage(canvas.toDataURL('image/jpeg',.88),'JPEG',20,y,imageWidth,h);y+=h+4;
+    }catch(_){write('Image unavailable in this export: '+picture.alt,9);}
+    const caption=el.querySelector('figcaption');if(caption)write(cleanText(caption),9);return;
+   }
    if(el.matches?.('.chart')){
     const svgEl=el.querySelector('svg');if(!svgEl)return;const view=svgEl.viewBox.baseVal;
     const image=new Image();const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svgEl)],{type:'image/svg+xml'}));

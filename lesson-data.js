@@ -22,14 +22,14 @@ window.LESSON = {
     [1992,'Compact fluorescent lamp',.000119,'0.43 seconds']
   ],
   metrics:[
-    {title:'Literacy',stat:'20% → 10.7% illiterate',text:'United States, 1870 to 1900, ages 10 and older. These historical categories describe basic reading/writing, not modern functional literacy. In 1900 the reported rates were 6.2% for White people and 44.5% for Black people. Race and class are different dimensions; unequal educational opportunity matters.',source:'NCES, 120 Years of Literacy.'},
+    {title:'Literacy',stat:'20% → 10.7% illiterate',text:'United States, 1870 to 1900, ages 14 and older. These historical categories describe basic reading/writing, not modern functional literacy. In 1900 the reported rates were 6.2% for White people and 44.5% for the source’s combined “Black and other” category. Race and class are different dimensions; unequal educational opportunity matters.',source:'NCES, 120 Years of Literacy.'},
     {title:'Schooling',stat:'51% → 75% enrolled',text:'United States, ages 5–19, 1900 to 1940. Enrollment is not the same as attendance, school quality, or graduation. Notice that the second date extends beyond our 1865–1920 focus.',source:'NCES, 120 Years of Literacy.'},
     {title:'Poverty',stat:'A series beginning in 1959',text:'The U.S. Census official poverty series begins in 1959. It cannot supply a comparable poverty rate for 1900. Its income thresholds measure one kind of deprivation; they do not capture every aspect of hardship. Later poverty measures are an extension of our inquiry, not direct evidence for the Gilded Age.',source:'U.S. Census, historical poverty tables.'},
     {title:'Energy per person',stat:'About 102 → 126 million Btu',text:'United States, 1850 to 1900. Calculation: EIA estimated total primary energy divided by Census population. Totals were 2.357 and 9.587 quadrillion Btu; populations were 23,191,876 and 76,212,168. These estimates exclude direct mechanical water power and do not measure a household’s energy bill or useful output.',source:'EIA Table E1; U.S. Census 1850 and 1900.'},
     {title:'Travel',stat:'Coast-to-coast in about a week',text:'The first transcontinental railroad connection was completed in 1869. The New York–San Francisco journey could take about seven days, compared with months on an overland wagon journey. Route, fare, safety, and access mattered; this is not a universal travel-time average.',source:'ASCE, Union Pacific Railroad historical landmark.'},
     {title:'Information delivery',stat:'A wire crossed the continent in 1861',text:'The transcontinental telegraph linked the eastern and western United States in 1861. Messages no longer had to travel physically the entire distance. Rapid transmission did not guarantee immediate delivery to every home, and service had a cost.',source:'National Park Service, Pony Express / telegraph history.'},
-    {title:'Paid work hours',stat:'55 scheduled / 49 paid hours',text:'U.S. manufacturing in 1915: about 55 scheduled hours in a week, compared with about 49 paid hours for production workers. These measures differ. Neither includes all farm work, unpaid household labor, or everyone’s leisure time. We cannot subtract these numbers from 168 and call the remainder “free time.”',source:'BLS, The life of American workers in 1915.'},
-    {title:'Household infrastructure',stat:'Available did not mean universal',text:'The Vanderbilt mansion, completed in 1899, had electricity, hot and cold running water, and flush toilets. This documented wealthy household shows what was possible, not what every home had. Infrastructure required equipment, local systems, and money.',source:'National Park Service, Vanderbilt Mansion audio tour.'}
+    {title:'Paid work hours',stat:'55-hour week / 49 paid hours',text:'U.S. manufacturing in 1915: an average workweek of about 55 hours, compared with about 49 paid hours for production workers. These measures differ. Neither includes all farm work, unpaid household labor, or everyone’s leisure time. We cannot subtract these numbers from 168 and call the remainder “free time.”',source:'BLS, The life of American workers in 1915.'},
+    {title:'Household infrastructure',stat:'Available did not mean universal',text:'The Vanderbilt mansion, occupied by 1899, had electricity, hot and cold running water, and flush toilets. This documented wealthy household shows what was possible, not what every home had. Infrastructure required equipment, local systems, and money.',source:'National Park Service, Vanderbilt Mansion audio tour.'}
   ],
   vocab:[
     ['Industrialization','A shift toward machine production, new energy sources, and reorganized work.'],
@@ -85,6 +85,13 @@ window.LESSON = {
     quadrillion:'One thousand trillion: 1,000,000,000,000,000.',
     transmission:'Sending information from one place to another.',
     scheduled:'Planned or required by a timetable.',
+    'absolute well-being':'The resources and opportunities a person has on their own: what they can afford or do.',
+    'relative position':'How a person’s resources or opportunities compare with those of other people.',
+    'security and participation':'Stability in important opportunities and the ability to take part in decisions.',
+    'income share':'The percentage of a group’s total income received by a person or subgroup.',
+    'public housing':'Rental housing supported by public programs to help eligible households afford a home.',
+    hypothetical:'Made up to explain an idea, rather than observed in historical evidence.',
+    ratio:'A comparison made by dividing one amount by another.',
     relative:'Described in comparison with something else.',
     absolute:'Described on its own scale, rather than as a position compared with others.',
     security:'Stability or protection against losing important resources and opportunities.',
@@ -103,14 +110,18 @@ window.LESSON = {
     'reconstructions':'Estimates of past conditions built from surviving evidence.'
   },
   sources:[
+    ['NPS, Vanderbilt Mansion photograph','https://www.nps.gov/places/vanderbilt-mansion.htm','Frederick and Louise Vanderbilt’s Hyde Park home; modern photograph credited NPS.'],
+    ['Lewis W. Hine / Library of Congress, Lydia Mills housing','https://www.loc.gov/item/2018674015/','Clinton, South Carolina, December 2, 1908; nclc.01477. No known publication restrictions. A mill-community example, not the Vermont character’s actual home.'],
+    ['Eli Pousson / Baltimore Heritage, Poe Homes photograph','https://commons.wikimedia.org/wiki/File:Apartments,_Poe_Homes_(1940),_800_W._Lexington_Street,_Baltimore,_MD_21201_(38883457860).jpg','March 6, 2018; CC0. The photograph does not establish household income, utilities, or happiness.'],
+    ['Housing Authority of Baltimore City, Transform Poe','https://www.habc.org/habc-information/programs-departments/planning-development/transform-poe/','Confirms Poe Homes was a public-housing community. It is one housing example, not representative of all limited-income families.'],
     ['G. Langner (1998), Roman-era survival reconstruction','https://pubmed.ncbi.nlm.nih.gov/12178163/','One contested model: about 20 years at birth and nearly 400 infant deaths per 1,000. Used as an illustrative year-1 best guess; evidence from later Roman centuries, not a measured year-1/global statistic.'],
     ['CDC/NCHS, Health United States 2019, Table 4','https://www.cdc.gov/nchs/data/hus/2019/004-508.pdf','Selected life expectancy benchmarks, 1900–2000.'],
-    ['CDC/NCHS, Health United States 2001','https://www.cdc.gov/nchs/data/data_acces_files/hus01cht.pdf','Selected infant mortality benchmarks, 1950–1990: 29.2, 26.0, 20.0, 12.6, 9.2 per 1,000 live births.'],
-    ['Maddison Project Database 2023','https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023?lang=en','GDPpc sheet, GBR and USA. 2011 international dollars. Early GBR coverage changes; selected benchmarks only. Credit underlying country sources as listed in the database.'],
+    ['CDC/NCHS, Health United States 2016, Table 11','https://www.cdc.gov/nchs/data/hus/2016/011.pdf','Selected infant mortality benchmarks, 1950–1990: 29.2, 26.0, 20.0, 12.6, 9.2 per 1,000 live births.'],
+    ['Maddison Project Database 2023','https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023?lang=en','GDPpc sheet, GBR and USA. 2011 international dollars. Early GBR coverage changes; selected benchmarks only. Underlying credits: Broadberry et al. (2015), British Economic Growth 1270–1870; Feinstein (1972), National Income Expenditure and Output of the United Kingdom 1855–1965; Sutch (2006), National Income and Product; Prados de la Escosura (2009), Lost Decades?; Maddison (1995), Monitoring the World Economy. Source and original-source sheets give coverage. MPD: Bolt and van Zanden (2024), DOI 10.1111/joes.12618.'],
     ['William D. Nordhaus, Do Real-Output and Real-Wage Measures Capture Reality? The History of Lighting Suggests Not','https://www.nber.org/system/files/chapters/c6064/c6064.pdf','Table 1.6, printed pages 52–53. Labor hours per 1,000 lumen-hours; selected technologies and changing wage measures.'],
     ['CDC/NCHS, life expectancy comparison','https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6019a5.htm','47.3 (1900 registration states) and 76.8 (2000 national).'],
     ['CDC/NCHS, infant mortality','https://www.cdc.gov/nchs/products/databriefs/db09.htm','Approximate early rate and 6.89 in 2000; infant deaths per 1,000 live births.'],
-    ['NCES, 120 Years of Literacy','https://nces.ed.gov/naal/lit_history.asp','Historical illiteracy and enrollment; age definitions matter.'],
+    ['NCES, 120 Years of Literacy','https://nces.ed.gov/naal/lit_history.asp','Illiteracy: ages 14+, 20.0% (1870), 10.7% (1900); racial column is “Black and other,” not Black alone. Enrollment: ages 5–19, 51% (1900), 75% (1940).'],
     ['NCES, 120 Years of American Education','https://nces.ed.gov/pubs93/93442.pdf','Statistical portrait underlying the historical education summary.'],
     ['U.S. Census, historical poverty tables','https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-poverty-people.html','Official series begins in 1959; no comparable 1900 rate shown.'],
     ['EIA, estimated primary energy, Table E1','https://www.eia.gov/totalenergy/data/annual/txt/ptb1601.html','1850 and 1900 totals divided by Census population; direct mechanical water power excluded.'],
@@ -118,9 +129,9 @@ window.LESSON = {
     ['U.S. Census, 1900 population','https://www.census.gov/programs-surveys/decennial-census/decade.1900.html','76,212,168.'],
     ['ASCE, Union Pacific Railroad','https://www.asce.org/about-civil-engineering/history-and-heritage/historic-landmarks/union-pacific-railroad/','Historic landmark summary; approximately seven-day transcontinental travel.'],
     ['NPS, Pony Express history','https://www.nps.gov/poex/learn/historyculture/index.htm','Transcontinental telegraph completed in 1861.'],
-    ['BLS, The life of American workers in 1915','https://www.bls.gov/opub/mlr/2016/article/the-life-of-american-workers-in-1915.htm','Scheduled manufacturing hours and paid production-worker hours are different measures.'],
+    ['BLS, The life of American workers in 1915','https://www.bls.gov/opub/mlr/2016/article/the-life-of-american-workers-in-1915.htm','Manufacturing workweek hours and paid production-worker hours are different measures.'],
     ['NPS, Vanderbilt Mansion audio tour','https://www.nps.gov/vama/learn/historyculture/audio-tour-of-the-mansion.htm','Documented household conveniences, 1899; not representative of all households.'],
-    ['World Inequality Report 2022, Chapter 2','https://wir2022.wid.world/chapter-2/','Figure 2.2: global top-10% / bottom-50% average-income ratio; not percentages or U.S. income shares.'],
+    ['World Inequality Report 2022, Chapter 2','https://wir2022.wid.world/chapter-2/','Figure 2.2: global average-income ratio 18 (1820) and 41 (1910). Population-group percentages differ from income shares. Dollar examples in this lesson are hypothetical.'],
     ['TED-Ed, How inventions change history (for better and for worse)','https://ed.ted.com/lessons/how-inventions-change-history-for-better-and-for-worse-kenneth-c-davis','Opening cotton-gin example; publisher description verified.'],
     ['National Archives, cotton gin patent','https://www.archives.gov/education/lessons/cotton-gin-patent','Patent issued 1794; invention developed in 1793.']
   ]

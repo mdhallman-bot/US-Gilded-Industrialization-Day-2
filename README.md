@@ -12,7 +12,7 @@ The GitHub connector does not expose a Pages settings write operation. Publicati
 
 ## Student workflow
 
-1. Open the teacher launch link (which supplies the class code) and enter the teacher-assigned pseudonymous ID, for example AB1234. No names.
+1. Create a unique username with at least two letters followed by at least two numbers (RIVER27). Do not use a real name or school student ID. Keep the same username when returning; a collision prompt helps students avoid taking another user’s name.
 2. Complete the opening, charts, and comparisons. Hover, focus, or tap dotted terms for definitions.
 3. Visit all six gallery stations; evidence is on separate wall cards. HTML contains only directions and response fields.
 4. Complete and check eight vocabulary matches.
@@ -23,7 +23,7 @@ PDF export includes lesson text, the current chart views, full benchmark tables,
 
 ## Backend
 
-The provided Apps Script endpoint is connected in `lesson-data.js`; its token is NOT committed. The teacher launch URL adds `#code=YOUR_SHARED_SECRET` to the classroom URL. The fragment stays out of GitHub/server requests, is read into sessionStorage, and removed from the address bar. A class-code input is available when opening the plain URL. Treat the classroom launch link as access-bearing; distribute it through your classroom assignment. `Code.gs` is the same backend supplied earlier. Spreadsheet ID stays in Apps Script's `SHEET_ID` property; it is not in the student app. Backend setup directions are at the top of `Code.gs`.
+The provided Apps Script endpoint and application token are connected automatically in `lesson-data.js`, as requested for username-only access. There is no class-code prompt. `Code.gs` is the same backend supplied earlier. Spreadsheet ID stays in Apps Script's `SHEET_ID` property; it is not in the student app. Backend setup directions are at the top of `Code.gs`.
 
 - Timestamped append-only history in Saves; Errors contains error codes, never responses or tokens.
 - IDs trimmed and uppercased, two or more letters followed by two or more digits.
@@ -31,9 +31,9 @@ The provided Apps Script endpoint is connected in `lesson-data.js`; its token is
 - Local device recovery precedes network requests; an acknowledged JSON response is required for cloud save status.
 - One request at a time; uncertain requests retry with the same request ID to avoid duplicates.
 - Optimistic revisions stop older tabs overwriting newer work. Preserve local work before loading another version.
-- Plain-text POST body avoids a CORS preflight. Live GitHub-origin browser saving still needs verification once Pages is enabled.
+- Plain-text POST body avoids a CORS preflight. Published GitHub-origin browser load/save has passed using synthetic work; fresh-session retrieval is verified in the subsequent audit update.
 
-This follows the migration packet's application-token/ID design. The class code is accessible to students using the app and **is not student authentication**. Someone with a known ID can access that ID's responses. Keep the spreadsheet private and use assigned pseudonymous IDs. No Google OAuth credentials or real student data are in the repo.
+This follows the migration packet's application-token/ID design. The application token is accessible in the public client code and **is not student authentication**. Someone with a known ID can access that ID's responses. Keep the spreadsheet private and use assigned pseudonymous IDs. No Google OAuth credentials or real student data are in the repo.
 
 ## Verification
 

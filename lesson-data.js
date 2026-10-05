@@ -2,7 +2,9 @@
 window.LESSON = {
   id:'u2-day2-industrial-transformation',
   endpoint:'https://script.google.com/macros/s/AKfycbxuvOZujw3FrxJeGSETDOT9AxfE_aXS522FXwbDoqtiGJ-izMWgpvpdYPR6NJoWnHnVdg/exec',
-  // Application token is supplied by the teacher launch link, never committed.
+  token:'ea445c98-c0d1-45c7-b2be-e7d94d46e50f18bf168a-98d1-414b-bd4a-087670e866be',
+  // Application token for the explicitly requested username-only student flow.
+  // This is not a Google credential or student authentication.
   gdp:[
     [1270,1192,null],[1500,1697,null],[1600,1691,null],[1700,2412,null],
     [1750,2702,null],[1800,3343,2545.488],[1820,3306,2674.048],

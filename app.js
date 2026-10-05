@@ -1,9 +1,7 @@
 'use strict';
 (() => {
 const D=window.LESSON, $=id=>document.getElementById(id);
-let token=new URLSearchParams(location.hash.slice(1)).get('code')||'';
-try{if(token)sessionStorage.setItem(D.id+':token',token);else token=sessionStorage.getItem(D.id+':token')||'';}catch(_){}
-if(token){history.replaceState(null,'',location.pathname+location.search);$('classCodeRow').hidden=true;} 
+const token=D.token;
 new ResizeObserver(entries=>document.documentElement.style.setProperty('--header-height',document.querySelector('header').getBoundingClientRect().height+'px')).observe(document.querySelector('header')); 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let studentId='', revision=0, dirty=false, saving=false, pending=null, timer=null, connected=false, conflicted=false;
@@ -110,10 +108,11 @@ async function api(payload){const controller=new AbortController();const timeout
 }
 function begin(id){studentId=id;$('main').inert=false;document.body.classList.add('ready');$('saveNow').disabled=false;$('switchId').hidden=false;completion();}
 $('loginForm').addEventListener('submit',async e=>{
- e.preventDefault();token=token||$('classCode').value.trim();if(!token){$('loginMessage').textContent='Open the classroom launch link or enter the class code your teacher provides.';return;}try{sessionStorage.setItem(D.id+':token',token);}catch(_){}const id=$('studentId').value.trim().toUpperCase();if(!/^[A-Z]{2,12}[0-9]{2,12}$/.test(id)){ $('loginMessage').textContent='Use your assigned ID: at least two letters followed by at least two digits.';return;}
+ e.preventDefault();const id=$('studentId').value.trim().toUpperCase();if(!/^[A-Z]{2,12}[0-9]{2,12}$/.test(id)){ $('loginMessage').textContent='Create a username with at least two letters followed by at least two numbers, such as RIVER27.';return;}
  $('start').disabled=true;$('loginMessage').textContent='Checking saved work…';const cached=getCache(id);
  try{
   const cloud=await api({action:'load_state',studentId:id});if(!cloud.ok)throw Error(cloud.code);
+  if(cloud.found&&!cached&&!confirm('This username already has saved work. If this is your username, choose OK to resume. Otherwise choose Cancel and create a different username.')){$('loginMessage').textContent='Choose a different username with at least two letters followed by at least two numbers.';return;}
   revision=cloud.revision;connected=true;pending=null;dirty=false;conflicted=false;
   if(cached?.dirty){
    apply(cached.state);dirty=true;pending=cached.pending?{...cached.pending,serial:-1}:null;begin(id);
@@ -171,7 +170,7 @@ $('reloadCloud').addEventListener('click',async()=>{
  try{const cloud=await api({action:'load_state',studentId});if(!cloud.ok)throw Error(cloud.code);apply(cloud.interactiveData||{});revision=cloud.revision;dirty=false;pending=null;connected=true;conflicted=false;editSerial++;cache();$('conflict').close();status('Loaded latest saved work · '+studentId);}catch(_){status('Could not load cloud work. This tab is still preserved.');}
 });
 $('conflict').addEventListener('cancel',e=>e.preventDefault());
-$('switchId').addEventListener('click',async()=>{await save();if((dirty||pending)&&!confirm('Some work is not saved to the spreadsheet. A device copy is kept when available. Change ID anyway?'))return;clearTimeout(timer);studentId='';$('main').inert=true;document.body.classList.remove('ready');$('saveNow').disabled=true;$('switchId').hidden=true;$('loginMessage').textContent='';$('studentId').focus();status('Enter your student ID to begin');});
+$('switchId').addEventListener('click',async()=>{await save();if((dirty||pending)&&!confirm('Some work is not saved to the spreadsheet. A device copy is kept when available. Change ID anyway?'))return;clearTimeout(timer);studentId='';$('main').inert=true;document.body.classList.remove('ready');$('saveNow').disabled=true;$('switchId').hidden=true;$('loginMessage').textContent='';$('studentId').focus();status('Enter your username to begin');});
 window.addEventListener('beforeunload',e=>{if(studentId&&(dirty||pending)){cache();e.preventDefault();e.returnValue='';}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&studentId){cache();save();}});
 window.addEventListener('online',()=>{if(studentId)save();});
@@ -186,7 +185,7 @@ async function exportPdf(){
    for(const line of lines){if(y+step+(bold?12:0)>260){doc.addPage();y=20;}doc.text(line,20,y);y+=step;}y+=3;
   }
   const c=completion();write(`COMPLETION: ${c.pct}% | ${c.answers} responses | ${c.matches}/8 matches | ${vocabMeta.checked?'vocabulary checked':'check pending'}`,13,true);
-  write(`Student ID: ${studentId} | Unit 2 Day 2: Industrial Transformation`,12,true);
+  write(`Username: ${studentId} | Unit 2 Day 2: Industrial Transformation`,12,true);
   write(`Exported ${new Date().toLocaleString()} | Cloud revision ${revision}. ${dirty||pending?'Unsaved local changes included.':'Last acknowledged cloud version.'}`,9);
   write('This PDF contains the pre-Boost lesson and student work. Submit the separate Google Doc for the interview and formative reflection.',10);
   async function visit(el){

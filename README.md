@@ -33,7 +33,7 @@ The provided Apps Script endpoint and application token are connected automatica
 - Optimistic revisions stop older tabs overwriting newer work. Preserve local work before loading another version.
 - Plain-text POST body avoids a CORS preflight. Published GitHub-origin browser load/save has passed using synthetic work; fresh-session retrieval is verified in the subsequent audit update.
 
-This follows the migration packet's application-token/ID design. The application token is accessible in the public client code and **is not student authentication**. Someone with a known ID can access that ID's responses. Keep the spreadsheet private and use assigned pseudonymous IDs. No Google OAuth credentials or real student data are in the repo.
+This follows the migration packet's application-token/ID design. The application token is accessible in the public client code and **is not student authentication**. Someone with a known ID can access that ID's responses. Keep the spreadsheet private and have students create unique pseudonymous usernames. No Google OAuth credentials or real student data are in the repo.
 
 ## Verification
 

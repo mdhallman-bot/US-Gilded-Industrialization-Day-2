@@ -33,3 +33,11 @@
 ## Operational limits
 
 Health and token-authenticated empty-state load were verified against the deployed backend before this build. Backend logic was tested with mocked Apps Script services. Browser tests and live save/load results are recorded in the completion report; do not assume deployment/Pages settings are verified until the actual published URL is tested. No actual student responses are used in testing.
+
+### Checks completed for this upload
+
+Headless Chromium passed: ID entry/normalization, save acknowledgment with a mocked backend, reload/resume, keyboard definitions (87 term occurrences), all eight vocabulary matches and score persistence, paste prevention, complete PDF download, narrow-screen horizontal overflow check, and stale-tab conflict preservation. All GDP benchmarks matched the official workbook. The 11-page sample PDF was rendered and visually reviewed; export is about 322KB.
+
+Live health and token-authenticated load succeeded earlier. The later live cross-origin browser test and repeat HTTP verification encountered network timeouts in this environment; **live browser cloud saving is not yet verified**. GitHub Pages currently returns404 and needs enabling in repository Settings. Before students use it, test a synthetic ID in the published page: type, Save now, wait for explicit cloud acknowledgment, then resume in a fresh browser/device. Device-only recovery is not proof of cloud saving.
+
+The class token is supplied at runtime via a teacher launch link or class-code input; it is absent from the public repository and published commit history. The initial automatic-review rejection of publishing a hardcoded token was resolved by this change.

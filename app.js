@@ -6,11 +6,12 @@ new ResizeObserver(entries=>document.documentElement.style.setProperty('--header
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let studentId='', revision=0, dirty=false, saving=false, pending=null, timer=null, connected=false, conflicted=false;
 let localAvailable=true, editSerial=0, vocabMeta={firstScore:null,latestScore:null,checked:false};
+let metricsOpened=Array(8).fill(false);
 const status=s=>$('saveStatus').textContent=s;
 const key=id=>`${D.id}:${id}`;
 function response(container,id,label,hint='') {
  container.classList.add('response');
- container.innerHTML=`<label for="r-${id}">${esc(label)}</label>${hint?`<p class="hint" id="hint-${id}">${esc(hint)}</p>`:''}<textarea id="r-${id}" data-answer="${id}" maxlength="1400" ${hint?`aria-describedby="hint-${id}"`:''} spellcheck="true"></textarea>`;
+ container.innerHTML=`<label for="r-${id}">${esc(label)}</label>${hint?`<p class="hint" id="hint-${id}">${esc(hint)}</p>`:''}<textarea id="r-${id}" data-answer="${id}" maxlength="${container.dataset.responseMax||1400}" ${hint?`aria-describedby="hint-${id}"`:''} spellcheck="true"></textarea>`;
 }
 document.querySelectorAll('[data-response]').forEach(el=>response(el,el.dataset.response,el.dataset.label,el.dataset.hint));
 for(let i=1;i<=6;i++){
@@ -18,7 +19,29 @@ for(let i=1;i<=6;i++){
  const box=document.createElement('div');response(box,`station${i}`,`Station ${i}: record one specific observation from the wall evidence and one question or possible implication.`);
  el.append(box);$('stations').append(el);
 }
-$('metrics').innerHTML=D.metrics.map(m=>`<details><summary>${esc(m.title)}</summary><p class="stat">${esc(m.stat)}</p><p>${esc(m.text)}</p><p class="source">${esc(m.source)}</p></details>`).join('');
+$('metrics').innerHTML=D.metrics.map((m,i)=>`<details data-metric="${i}"><summary>${esc(m.title)} <span class="metric-state" id="metric-state-${i}"></span></summary><p class="stat">${esc(m.stat)}</p><p>${esc(m.text)}</p><p class="source">${esc(m.source)}</p><div id="metric-answer-${i}" data-response-max="600"></div></details>`).join('');
+D.metrics.forEach((m,i)=>response($('metric-answer-'+i),'metric'+i,m.question,'One or two sentences. Use a detail from this card.'));
+function metricProgress(){
+ let answered=0;
+ D.metrics.forEach((m,i)=>{const done=!!$('r-metric'+i).value.trim();if(done)answered++;$('metric-state-'+i).textContent=done?'— response entered':metricsOpened[i]?'— opened':'';});
+ $('metricProgress').textContent=`Evidence cards: ${metricsOpened.filter(Boolean).length}/8 opened · ${answered}/8 responses entered.`;
+}
+document.querySelectorAll('[data-metric]').forEach(el=>el.addEventListener('toggle',()=>{const i=Number(el.dataset.metric);if(el.open&&!metricsOpened[i]){metricsOpened[i]=true;metricProgress();changed();}}));
+metricProgress();
+// The pie slices are mutually exclusive quintiles; top shares are separate overlapping rows.
+const incomeLabels=['Lowest 20%','Second 20%','Middle 20%','Fourth 20%','Highest 20%'];
+const incomeColors=['#82b5c8','#d9b86f','#8faaa0','#667f9b','#a44b2f'];
+$('incomeCharts').innerHTML=D.incomeShares.map(row=>{
+ let angle=-Math.PI/2,body='';
+ row.shares.forEach((share,i)=>{const start=angle;angle+=share/100*Math.PI*2;const x=a=>180+106*Math.cos(a),y=a=>130+106*Math.sin(a);body+=`<path d="M180,130 L${x(start)},${y(start)} A106,106 0 ${share>50?1:0},1 ${x(angle)},${y(angle)} Z" fill="${incomeColors[i]}" stroke="white" stroke-width="2"><title>${esc(incomeLabels[i])}: ${share.toFixed(2)}% of income</title></path>`;});
+ body+=incomeLabels.map((label,i)=>`<rect x="20" y="${258+i*25}" width="13" height="13" fill="${incomeColors[i]}"/><text x="42" y="${270+i*25}" font-size="14" fill="#172c3b">${label}</text><text x="338" y="${270+i*25}" text-anchor="end" font-size="14" fill="#172c3b">${row.shares[i].toFixed(2)}%</text>`).join('');
+ return `<article><h3>${row.year}${row.year===1880?' · Gilded Age':row.year===1950?' · Midcentury':' · Recent'}</h3><div class="chart"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 400" role="img" aria-label="U.S. income shares in ${row.year}. ${incomeLabels.map((label,i)=>label+': '+row.shares[i].toFixed(2)+' percent').join('; ')}">${body}</svg></div><p class="source">Top 10%: ${row.top10.toFixed(2)}% of income<br>Top 1%: ${row.top1.toFixed(2)}% of income</p></article>`;
+}).join('');
+$('incomeTable').innerHTML='<table><caption>Share of total U.S. pretax income (%)</caption><thead><tr><th scope="col">Income-ranked group</th>'+D.incomeShares.map(r=>`<th scope="col">${r.year}</th>`).join('')+'</tr></thead><tbody>'+incomeLabels.map((label,i)=>`<tr><th scope="row">${label}</th>${D.incomeShares.map(r=>`<td>${r.shares[i].toFixed(2)}%</td>`).join('')}</tr>`).join('')+['top10','top1'].map((key,i)=>`<tr><th scope="row">${i?'Top 1% (inside top 10%)':'Top 10% (inside highest 20%)'}</th>${D.incomeShares.map(r=>`<td>${r[key].toFixed(2)}%</td>`).join('')}</tr>`).join('')+'</tbody></table>';
+// A compact shared comparison keeps all three income pies together in PDF exports.
+const incomePrintTemplate=document.createElement('template');incomePrintTemplate.id='incomePrintChart';
+incomePrintTemplate.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 290"><rect width="900" height="290" fill="white"/>${D.incomeShares.map((r,i)=>`<text x="${150+i*300}" y="25" text-anchor="middle" font-family="Arial,sans-serif" font-size="21" fill="#172c3b">${r.year}${r.year===1880?' · Gilded Age':''}</text><svg x="${i*300}" y="35" width="300" height="210" viewBox="0 0 360 250">${[...$('incomeCharts').querySelectorAll('article')][i].querySelector('svg').innerHTML.split('<rect')[0]}</svg>`).join('')}<text x="450" y="273" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" fill="#172c3b">Quintiles: lowest 20% → highest 20%, clockwise from the top. Exact shares in the table.</text></svg>`;
+document.body.append(incomePrintTemplate);
 $('sourceList').innerHTML=D.sources.map(([name,url,note])=>`<li><a href="${esc(url)}" target="_blank" rel="noopener">${esc(name)}</a> — ${esc(note)}</li>`).join('');
 const order=[5,2,7,0,6,3,1,4];
 $('vocabCheck').innerHTML=D.vocab.map(([term],i)=>`<div class="vocab-row" id="vrow-${i}"><label for="v-${i}">${esc(term)}</label><select id="v-${i}" data-vocab="${i}"><option value="">Choose a definition…</option>${order.map(j=>`<option value="${j}">${esc(D.vocab[j][1])}</option>`).join('')}</select><p class="selected-definition" id="selected-${i}"></p></div>`).join('');
@@ -102,12 +125,13 @@ $('lightTable').innerHTML='<table><thead><tr><th>Year</th><th>Technology</th><th
 timeline();gdp();survival();light();
 document.querySelectorAll('[data-scale]').forEach(btn=>btn.addEventListener('click',()=>{timeline(btn.dataset.scale);document.querySelectorAll('[data-scale]').forEach(b=>b.setAttribute('aria-pressed',b===btn));}));
 document.querySelectorAll('[data-gdp]').forEach(btn=>btn.addEventListener('click',()=>{gdp(btn.dataset.gdp);document.querySelectorAll('[data-gdp]').forEach(b=>b.setAttribute('aria-pressed',b===btn));}));
-function snapshot(){return {schemaVersion:1,answers:Object.fromEntries([...document.querySelectorAll('[data-answer]')].map(el=>[el.dataset.answer,el.value])),vocab:[...document.querySelectorAll('[data-vocab]')].map(el=>el.value),vocabMeta:{...vocabMeta}};}
+function snapshot(){return {schemaVersion:1,answers:Object.fromEntries([...document.querySelectorAll('[data-answer]')].map(el=>[el.dataset.answer,el.value])),vocab:[...document.querySelectorAll('[data-vocab]')].map(el=>el.value),vocabMeta:{...vocabMeta},metricsOpened:[...metricsOpened]};}
 function apply(data){
+ metricsOpened=D.metrics.map((_,i)=>data?.metricsOpened?.[i]===true);
  document.querySelectorAll('[data-answer]').forEach(el=>el.value=String(data?.answers?.[el.dataset.answer]||'').slice(0,1400));
  document.querySelectorAll('[data-vocab]').forEach((el,i)=>{const v=data?.vocab?.[i];el.value=/^[0-7]$/.test(String(v))?String(v):'';});
  vocabMeta={firstScore:null,latestScore:null,checked:false,...data?.vocabMeta};
- renderVocab(false);completion();
+ renderVocab(false);metricProgress();completion();
 }
 function cache(){try{localStorage.setItem(key(studentId),JSON.stringify({revision,dirty,pending,state:snapshot(),updatedAt:new Date().toISOString()}));localAvailable=true;}catch(_){localAvailable=false;status('Device backup unavailable — use Save now and export your work.');}}
 function getCache(id){try{const value=JSON.parse(localStorage.getItem(key(id))||'null');return value&&value.state?value:null;}catch(_){return null;}}
@@ -135,7 +159,7 @@ $('loginForm').addEventListener('submit',async e=>{
  }catch(_){revision=cached?.revision||0;connected=false;pending=cached?.pending?{...cached.pending,serial:-1}:null;dirty=!!cached?.dirty;apply(cached?.state||{});begin(id);status('Offline — cloud resume unavailable. Device copy only; retry Save now.');}
  finally{$('start').disabled=false;}
 });
-function changed(){if(!studentId)return;editSerial++;dirty=true;cache();completion();schedule();}
+function changed(){if(!studentId)return;editSerial++;dirty=true;cache();metricProgress();completion();schedule();}
 function schedule(){clearTimeout(timer);if(!conflicted)timer=setTimeout(save,1800);}
 async function save(){
  if(!studentId||saving||conflicted)return;clearTimeout(timer);saving=true;status('Saving…');
@@ -211,8 +235,8 @@ async function exportPdf(){
     }catch(_){write('Image unavailable in this export: '+picture.alt,9);}
     const caption=el.querySelector('figcaption');if(caption)write(cleanText(caption),9);return;
    }
-   if(el.matches?.('.chart')){
-    const svgEl=el.querySelector('svg');if(!svgEl)return;const view=svgEl.viewBox.baseVal;
+   if(el.id==='incomeCharts'||el.matches?.('.chart')){
+    const svgEl=el.id==='incomeCharts'?$('incomePrintChart').content.firstElementChild:el.querySelector('svg');if(!svgEl)return;const view=svgEl.viewBox.baseVal;
     const image=new Image();const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svgEl)],{type:'image/svg+xml'}));
     try{await new Promise((res,rej)=>{image.onload=res;image.onerror=rej;image.src=url;});const canvas=document.createElement('canvas');canvas.width=view.width*2;canvas.height=view.height*2;canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);const h=width*view.height/view.width;if(y+h>260){doc.addPage();y=20;}doc.addImage(canvas.toDataURL('image/jpeg',.9),'JPEG',20,y,width,h);y+=h+5;}finally{URL.revokeObjectURL(url);}return;
    }

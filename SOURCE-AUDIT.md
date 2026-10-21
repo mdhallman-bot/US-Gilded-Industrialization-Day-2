@@ -79,3 +79,35 @@ Math and access:
 - No student is asked to disclose household finances. Captions compare capabilities and institutions, not worth/happiness. Every image has alt text and source/caption. Assets are served from the same repository and included in both PDF routes. Student-export image failure keeps the work and captions, rather than aborting the PDF.
 
 Remaining verification limit: the full TED-Ed video transcript has not been independently retrieved and audited. Its publisher description and lesson’s historical claims were checked; teacher preview remains appropriate. Housing-photo exteriors cannot establish home interiors or any person’s experience.
+
+
+## Accountability and income/poverty revision — October 21, 2026
+
+- Parts B and C now each have five questions: direct reading, calculation, inference, and source/access limitations. Existing survival and lighting response IDs retained so earlier saved answers remain retrievable.
+- Each of the eight supporting cards has its own response field. Opened-card history and responses save/reload; opening alone is not treated as understanding. Final synthesis asks students to name a card, explain one change/problem, and state what it cannot tell them.
+- Section 04 now has nine prompts: progress/fairness interpretations, income ratios, quintile comparison, overlapping top shares, limits of income shares, ethical reasoning, and absolute/relative poverty. No particular political conclusion is required and students are not asked for personal finances.
+
+### Income data provenance and arithmetic
+
+Primary input: https://wid.world/bulk_download/WID_data_US.csv, downloaded October 21, 2026. Bulk variable sptincj992, corresponding to dictionary notation sptinc992j: US pretax national income shares, equal-split adults age 20+. Income shared within couples; not Census household income, wages alone, wealth, posttax disposable income, or real dollar living standards. Historical/modern methods differ and researchers debate estimates. WID historical technical note 2025/10, February 13, 2026 revision, corroborates 1880 top 10% share .41 and top 1% .145. 1880 rows carry bulk data_quality 0: label as low-confidence model reconstruction, not a modern survey; published benchmark input figures and modeled distribution are not equally certain. Do not imply equal data precision across dates.
+
+Cumulative shares for bottom20/bottom40/bottom60/bottom80, followed by top10/top1:
+- 1880: .0406/.1172/.2506/.4416; .41/.145.
+- 1950: .0368/.1231/.2711/.4779; .3833/.1639.
+- 2024: .0216/.0854/.1976/.3848; .4676/.2073.
+
+Quintiles obtained by consecutive cumulative differences, last = 1 - bottom80. Display two decimal percentage points, all five slices sum exactly 100.00%:
+- 1880: 4.06, 7.66, 13.34, 19.10, 55.84.
+- 1950: 3.68, 8.63, 14.80, 20.68, 52.21.
+- 2024: 2.16, 6.38, 11.22, 18.72, 61.52.
+
+Pie charts contain only mutually exclusive quintiles. Top10/top1 are separately labeled nested shares, not extra slices. Top1 is included in top10, both included in highest quintile. Income shares and total income are different: a falling share does not prove falling purchasing power. 2024 is explicitly a recent-data snapshot, not a measured 2026 value. These three points are not used to assert a continuous trend or that every inequality measure was lower in 1950 than in 1880 (top1 here was higher).
+
+### Poverty concepts
+
+OECD poverty-rate definition supports relative poverty below half the median household income; actual OECD comparisons adjust household sizes and use disposable income. World Bank conceptual explanation supports absolute lines fixed in real purchasing power and relative lines linked to typical living standards. Use the World Bank page for concepts only; its old international poverty-line dollar thresholds are not reused.
+Fictional same-sized-household example, not official US thresholds: $26,000 income exceeds $24,000 basic-needs line, below half $60,000 median ($30,000). Median increasing to $70,000 raises relative line to $35,000; unchanged household income/prices leaves purchasing power unchanged. Definitions do not rank residents' worth; exterior housing photos establish neither income nor poverty status.
+
+### Save and export verification
+
+39 response fields (including six wall-station fields); eight vocabulary matches plus checked status. Existing answer keys and lessonId preserved; new fields are additive. Short added fields capped at 600 characters; original fields retain 1,400. Maximum modeled answer JSON ~36KB, below existing backend 45,000-character limit, with headroom for vocabulary/open-card metadata. Fresh browser context roundtrip checked all answers and eight opened-card flags; older saved state without new keys loads successfully. Exported PDF and emergency packet include every new question; completion percentage reflects all fields, not answer quality. The enlarged assignment no longer claims the old minute-by-minute activity timing; teacher must allow additional time or spread work across lessons.

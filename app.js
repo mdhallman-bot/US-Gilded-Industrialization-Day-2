@@ -14,7 +14,16 @@ function response(container,id,label,hint='') {
  container.innerHTML=`<label for="r-${id}">${esc(label)}</label>${hint?`<p class="hint" id="hint-${id}">${esc(hint)}</p>`:''}<textarea id="r-${id}" data-answer="${id}" maxlength="${container.dataset.responseMax||1400}" ${hint?`aria-describedby="hint-${id}"`:''} spellcheck="true"></textarea>`;
 }
 document.querySelectorAll('[data-response]').forEach(el=>response(el,el.dataset.response,el.dataset.label,el.dataset.hint));
-$('evidenceCards').innerHTML=D.evidenceCards.map(card=>`<details class="evidence-card" id="evidence-card-${card.number}"><summary>Card ${card.number}: ${esc(card.title)} <span class="card-badge">${card.number===1||card.number===3?'Required':card.number===2?'Optional':'Choose one of 4–6'}</span></summary><figure class="lesson-visual evidence"><a href="${esc(card.image)}" target="_blank" rel="noopener" aria-label="Open evidence card ${card.number} full-size"><img src="${esc(card.image)}" width="1105" height="1430" alt="${esc(card.alt)}"></a><figcaption>Card ${card.number}: ${esc(card.title)}. Original classroom poster supplied by your teacher; sources and image credits appear on the card. Select the image to open it full-size.</figcaption></figure><details class="card-transcript" data-optional><summary>Read the card text</summary>${card.text.map(t=>`<p>${esc(t)}</p>`).join('')}</details></details>`).join('');
+const povertyFirst=$('r-poverty_first'), revealButton=$('revealPoverty');
+function updatePovertyReveal(){
+ const ready=!!povertyFirst.value.trim();
+ revealButton.disabled=!ready;
+ revealButton.textContent=$('povertyReveal').hidden?(ready?'Reveal the missing context':'Write your first judgment to unlock the reveal'):'Context revealed';
+}
+povertyFirst.addEventListener('input',updatePovertyReveal);
+revealButton.addEventListener('click',()=>{$('povertyReveal').hidden=false;revealButton.setAttribute('aria-expanded','true');updatePovertyReveal();});
+
+$('evidenceCards').innerHTML=D.evidenceCards.map(card=>`<details class="evidence-card" id="evidence-card-${card.number}"><summary>Card ${card.number}: ${esc(card.title)} <span class="card-badge">${[1,3,5].includes(card.number)?'Required':'Optional'}</span></summary><figure class="lesson-visual evidence"><a href="${esc(card.image)}" target="_blank" rel="noopener" aria-label="Open evidence card ${card.number} full-size"><img src="${esc(card.image)}" width="1105" height="1430" alt="${esc(card.alt)}"></a><figcaption>Card ${card.number}: ${esc(card.title)}. Original classroom poster supplied by your teacher; sources and image credits appear on the card. Select the image to open it full-size.</figcaption></figure><details class="card-transcript" data-optional><summary>Read the card text</summary>${card.text.map(t=>`<p>${esc(t)}</p>`).join('')}</details></details>`).join('');
 $('metrics').innerHTML=D.metrics.map(m=>`<details><summary>${esc(m.title)}</summary><p class="stat">${esc(m.stat)}</p><p>${esc(m.text)}</p><p class="source">${esc(m.source)}</p></details>`).join('');
 function metricProgress(){} // Optional supporting-card history remains compatible with older saves.
 // The pie slices are mutually exclusive quintiles; top shares are separate overlapping rows.
@@ -182,6 +191,7 @@ function renderVocab(check){
 }
 $('checkVocab').addEventListener('click',()=>{renderVocab(true);changed();});
 function completion(){
+ updatePovertyReveal();
  const fields=[...document.querySelectorAll('[data-answer]')].filter(el=>!el.closest('[data-optional]'));
  const answers=fields.filter(el=>el.value.trim()).length,total=fields.length,done=answers,pct=total?Math.round(done/total*100):0;
  $('completion').innerHTML=`<strong>${pct}% complete</strong><p>${answers}/${total} required responses entered.</p><p>Completion records filled fields, not answer quality. Optional reading and vocabulary do not count.</p>`;
@@ -213,6 +223,7 @@ async function exportPdf(){
   write(`Exported ${new Date().toLocaleString()} | Cloud revision ${revision}. ${dirty||pending?'Unsaved local changes included.':'Last acknowledged cloud version.'}`,9);
   write('This PDF contains the pre-Boost lesson and student work. Submit the separate Google Doc for the interview and formative reflection.',10);
   async function visit(el){
+   if(el.id==='supportingEvidence'){const field=el.querySelector('.response');if(field?.querySelector('textarea').value.trim()){write('Optional supporting evidence',13,true);await visit(field);}return;}
    if(el.matches?.('[data-optional]'))return;
    if(el.matches?.('.response')){write(cleanText(el.querySelector('label')),11,true);write(el.querySelector('textarea').value.trim()||'[No response entered]',11);return;}
    if(el.matches?.('figure.lesson-visual')){
@@ -252,3 +263,4 @@ async function exportPdf(){
 $('downloadPdf').addEventListener('click',exportPdf);
 completion();
 })();
+

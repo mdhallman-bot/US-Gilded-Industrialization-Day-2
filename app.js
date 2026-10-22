@@ -6,7 +6,7 @@ new ResizeObserver(entries=>document.documentElement.style.setProperty('--header
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let studentId='', revision=0, dirty=false, saving=false, pending=null, timer=null, connected=false, conflicted=false;
 let localAvailable=true, editSerial=0, vocabMeta={firstScore:null,latestScore:null,checked:false};
-let metricsOpened=Array(8).fill(false);
+let metricsOpened=Array(8).fill(false), retainedAnswers={};
 const status=s=>$('saveStatus').textContent=s;
 const key=id=>`${D.id}:${id}`;
 function response(container,id,label,hint='') {
@@ -14,20 +14,9 @@ function response(container,id,label,hint='') {
  container.innerHTML=`<label for="r-${id}">${esc(label)}</label>${hint?`<p class="hint" id="hint-${id}">${esc(hint)}</p>`:''}<textarea id="r-${id}" data-answer="${id}" maxlength="${container.dataset.responseMax||1400}" ${hint?`aria-describedby="hint-${id}"`:''} spellcheck="true"></textarea>`;
 }
 document.querySelectorAll('[data-response]').forEach(el=>response(el,el.dataset.response,el.dataset.label,el.dataset.hint));
-for(let i=1;i<=6;i++){
- const el=document.createElement('article');el.className='station';el.innerHTML=`<h3>Station ${i}</h3>`;
- const box=document.createElement('div');response(box,`station${i}`,`Station ${i}: record one specific observation from the wall evidence and one question or possible implication.`);
- el.append(box);$('stations').append(el);
-}
-$('metrics').innerHTML=D.metrics.map((m,i)=>`<details data-metric="${i}"><summary>${esc(m.title)} <span class="metric-state" id="metric-state-${i}"></span></summary><p class="stat">${esc(m.stat)}</p><p>${esc(m.text)}</p><p class="source">${esc(m.source)}</p><div id="metric-answer-${i}" data-response-max="600"></div></details>`).join('');
-D.metrics.forEach((m,i)=>response($('metric-answer-'+i),'metric'+i,m.question,'One or two sentences. Use a detail from this card.'));
-function metricProgress(){
- let answered=0;
- D.metrics.forEach((m,i)=>{const done=!!$('r-metric'+i).value.trim();if(done)answered++;$('metric-state-'+i).textContent=done?'— response entered':metricsOpened[i]?'— opened':'';});
- $('metricProgress').textContent=`Evidence cards: ${metricsOpened.filter(Boolean).length}/8 opened · ${answered}/8 responses entered.`;
-}
-document.querySelectorAll('[data-metric]').forEach(el=>el.addEventListener('toggle',()=>{const i=Number(el.dataset.metric);if(el.open&&!metricsOpened[i]){metricsOpened[i]=true;metricProgress();changed();}}));
-metricProgress();
+$('evidenceCards').innerHTML=D.evidenceCards.map(card=>`<details class="evidence-card" id="evidence-card-${card.number}"><summary>Card ${card.number}: ${esc(card.title)} <span class="card-badge">${card.number===1||card.number===3?'Required':card.number===2?'Optional':'Choose one of 4–6'}</span></summary><figure class="lesson-visual evidence"><a href="${esc(card.image)}" target="_blank" rel="noopener" aria-label="Open evidence card ${card.number} full-size"><img src="${esc(card.image)}" width="1105" height="1430" alt="${esc(card.alt)}"></a><figcaption>Card ${card.number}: ${esc(card.title)}. Original classroom poster supplied by your teacher; sources and image credits appear on the card. Select the image to open it full-size.</figcaption></figure><details class="card-transcript" data-optional><summary>Read the card text</summary>${card.text.map(t=>`<p>${esc(t)}</p>`).join('')}</details></details>`).join('');
+$('metrics').innerHTML=D.metrics.map(m=>`<details><summary>${esc(m.title)}</summary><p class="stat">${esc(m.stat)}</p><p>${esc(m.text)}</p><p class="source">${esc(m.source)}</p></details>`).join('');
+function metricProgress(){} // Optional supporting-card history remains compatible with older saves.
 // The pie slices are mutually exclusive quintiles; top shares are separate overlapping rows.
 const incomeLabels=['Lowest 20%','Second 20%','Middle 20%','Fourth 20%','Highest 20%'];
 const incomeColors=['#82b5c8','#d9b86f','#8faaa0','#667f9b','#a44b2f'];
@@ -125,8 +114,9 @@ $('lightTable').innerHTML='<table><thead><tr><th>Year</th><th>Technology</th><th
 timeline();gdp();survival();light();
 document.querySelectorAll('[data-scale]').forEach(btn=>btn.addEventListener('click',()=>{timeline(btn.dataset.scale);document.querySelectorAll('[data-scale]').forEach(b=>b.setAttribute('aria-pressed',b===btn));}));
 document.querySelectorAll('[data-gdp]').forEach(btn=>btn.addEventListener('click',()=>{gdp(btn.dataset.gdp);document.querySelectorAll('[data-gdp]').forEach(b=>b.setAttribute('aria-pressed',b===btn));}));
-function snapshot(){return {schemaVersion:1,answers:Object.fromEntries([...document.querySelectorAll('[data-answer]')].map(el=>[el.dataset.answer,el.value])),vocab:[...document.querySelectorAll('[data-vocab]')].map(el=>el.value),vocabMeta:{...vocabMeta},metricsOpened:[...metricsOpened]};}
+function snapshot(){return {schemaVersion:1,answers:{...retainedAnswers,...Object.fromEntries([...document.querySelectorAll('[data-answer]')].map(el=>[el.dataset.answer,el.value]))},vocab:[...document.querySelectorAll('[data-vocab]')].map(el=>el.value),vocabMeta:{...vocabMeta},metricsOpened:[...metricsOpened]};}
 function apply(data){
+ retainedAnswers={...(data?.answers||{})};
  metricsOpened=D.metrics.map((_,i)=>data?.metricsOpened?.[i]===true);
  document.querySelectorAll('[data-answer]').forEach(el=>el.value=String(data?.answers?.[el.dataset.answer]||'').slice(0,1400));
  document.querySelectorAll('[data-vocab]').forEach((el,i)=>{const v=data?.vocab?.[i];el.value=/^[0-7]$/.test(String(v))?String(v):'';});
@@ -192,10 +182,10 @@ function renderVocab(check){
 }
 $('checkVocab').addEventListener('click',()=>{renderVocab(true);changed();});
 function completion(){
- const fields=[...document.querySelectorAll('[data-answer]')], answers=fields.filter(el=>el.value.trim()).length, matches=[...document.querySelectorAll('[data-vocab]')].filter(el=>el.value!=='').length;
- const total=fields.length+9, done=answers+matches+(vocabMeta.checked?1:0), pct=Math.round(done/total*100);
- $('completion').innerHTML=`<strong>${pct}% complete</strong><p>${answers}/${fields.length} responses · ${matches}/8 vocabulary matches · ${vocabMeta.checked?'vocabulary checked':'vocabulary check still needed'}</p><p>Completion records filled fields, not the quality of your historical explanation.</p>`;
- return {pct,answers,matches,total,done};
+ const fields=[...document.querySelectorAll('[data-answer]')].filter(el=>!el.closest('[data-optional]'));
+ const answers=fields.filter(el=>el.value.trim()).length,total=fields.length,done=answers,pct=total?Math.round(done/total*100):0;
+ $('completion').innerHTML=`<strong>${pct}% complete</strong><p>${answers}/${total} required responses entered.</p><p>Completion records filled fields, not answer quality. Optional reading and vocabulary do not count.</p>`;
+ return {pct,answers,matches:0,total,done};
 }
 function recovery(){const data={lessonId:D.id,studentId,revision,state:snapshot(),exportedAt:new Date().toISOString()};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`${studentId}-Day2-recovery.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('backup').addEventListener('click',recovery);$('conflictBackup').addEventListener('click',recovery);
@@ -218,11 +208,12 @@ async function exportPdf(){
   function write(text,size=11,bold=false){const lines=doc.setFont('helvetica',bold?'bold':'normal').setFontSize(size).splitTextToSize(pdfText(text),width);const step=size*.45;
    for(const line of lines){if(y+step+(bold?12:0)>260){doc.addPage();y=20;}doc.text(line,20,y);y+=step;}y+=3;
   }
-  const c=completion();write(`COMPLETION: ${c.pct}% | ${c.answers} responses | ${c.matches}/8 matches | ${vocabMeta.checked?'vocabulary checked':'check pending'}`,13,true);
+  const c=completion();write(`COMPLETION: ${c.pct}% | ${c.answers}/${c.total} required responses`,13,true);
   write(`Username: ${studentId} | Unit 2 Day 2: Industrial Transformation`,12,true);
   write(`Exported ${new Date().toLocaleString()} | Cloud revision ${revision}. ${dirty||pending?'Unsaved local changes included.':'Last acknowledged cloud version.'}`,9);
   write('This PDF contains the pre-Boost lesson and student work. Submit the separate Google Doc for the interview and formative reflection.',10);
   async function visit(el){
+   if(el.matches?.('[data-optional]'))return;
    if(el.matches?.('.response')){write(cleanText(el.querySelector('label')),11,true);write(el.querySelector('textarea').value.trim()||'[No response entered]',11);return;}
    if(el.matches?.('figure.lesson-visual')){
     const picture=el.querySelector('img');
